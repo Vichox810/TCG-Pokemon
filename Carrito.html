@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carrito de Compras</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .carrito {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      max-width: 480px;
+      width: 100%;
+      padding: 25px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    ul.productos-lista {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 20px;
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+
+    ul.productos-lista li {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+      font-size: 15px;
+      color: #444;
+    }
+
+    ul.productos-lista li:last-child {
+      border-bottom: none;
+    }
+
+    .producto-detalle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .producto-detalle img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .producto-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .producto-info span {
+      font-size: 14px;
+    }
+
+    .btn-eliminar {
+      background: #ff4d4f;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.3s ease;
+    }
+    .btn-eliminar:hover {
+      background: #e04444;
+    }
+
+    .total-container {
+      font-weight: 600;
+      font-size: 18px;
+      color: #222;
+      text-align: right;
+      margin-bottom: 20px;
+    }
+
+    .codigo-descuento {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .codigo-descuento input {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 140px;
+    }
+    .codigo-descuento button {
+      background: #4a90e2;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .codigo-descuento button:hover {
+      background: #3c78c1;
+    }
+
+    .tarjetas {
+      margin-bottom: 25px;
+    }
+    .tarjetas label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .tarjetas input[type="radio"] {
+      accent-color: #4a90e2;
+      cursor: pointer;
+    }
+    .tarjetas label:hover {
+      background: #f0f7ff;
+      border-color: #4a90e2;
+    }
+    .tarjetas input[type="radio"]:checked + span {
+      font-weight: 700;
+      color: #4a90e2;
+    }
+
+    .btn-pagar {
+      width: 100%;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 0;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+    .btn-pagar:hover {
+      background: #218838;
+    }
+
+    @media (max-width: 480px) {
+      .carrito { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="carrito">
+    <h2>Tu Carrito</h2>
+    <ul class="productos-lista" id="lista-productos"></ul>
+
+    <div class="total-container" id="total-pagar">Total: $0.00</div>
+
+    <div class="codigo-descuento">
+      <input type="text" id="codigo-descuento" placeholder="Código de descuento" maxlength="10" />
+      <button id="aplicar-descuento">Aplicar</button>
+    </div>
+
+    <div class="tarjetas">
+      <label>
+        <input type="radio" name="tarjeta" value="Visa **** 1234" checked />
+        <span>Visa **** 1234</span>
+      </label>
+      <label>
+        <input type="radio" name="tarjeta" value="Mastercard **** 5678" />
+        <span>Mastercard **** 5678</span>
+      </label>
+    </div>
+
+    <button class="btn-pagar" id="btn-pagar">Pagar</button>
+  </div>
+
+  <script>
+    const productosDisponibles = [
+      {
+        id: 1,
+        nombre: 'Deck Zacian',
+        precio: 25.99,
+        imagen: 'img/Zacian.png'
+      },
+      {
+        id: 2,
+        nombre: 'Deck Zamazenta',
+        precio: 25.99,
+        imagen: 'img/Zamazenta.png'
+      },
+      {
+        id: 3,
+        nombre: 'Deck Mewtwo & Melmetal',
+        precio: 30.99,
+        imagen: 'img/Mewtwo-Meltan.png'
+      }
+    ];
+
+    let carrito = [];
+    let descuentoActivo = 0;
+
+    const listaProductosEl = document.getElementById('lista-productos');
+    const totalPagarEl = document.getElementById('total-pagar');
+    const codigoDescuentoInput = document.getElementById('codigo-descuento');
+    const btnAplicarDescuento = document.getElementById('aplicar-descuento');
+    const btnPagar = document.getElementById('btn-pagar');
+
+    function actualizarLista() {
+      listaProductosEl.innerHTML = '';
+      carrito.forEach((producto, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="producto-detalle">
+            <img src="${producto.imagen}" alt="${producto.nombre}">
+            <div class="producto-info">
+              <strong>${producto.nombre}</strong>
+              <span>$${producto.precio.toFixed(2)}</span>
+            </div>
+          </div>
+          <button class="btn-eliminar" data-index="${index}">Eliminar</button>
+        `;
+        listaProductosEl.appendChild(li);
+      });
+
+      document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.onclick = () => {
+          const index = parseInt(btn.getAttribute('data-index'));
+          carrito.splice(index, 1);
+          actualizarLista();
+          calcularTotal();
+        };
+      });
+    }
+
+    function calcularTotal() {
+      const subtotal = carrito.reduce((sum, p) => sum + p.precio, 0);
+      const totalConDescuento = subtotal * (1 - descuentoActivo);
+      totalPagarEl.textContent = `Total: $${totalConDescuento.toFixed(2)}`;
+    }
+
+    function agregarProducto(id) {
+      const producto = productosDisponibles.find(p => p.id === id);
+      if (producto) {
+        carrito.push(producto);
+        actualizarLista();
+        calcularTotal();
+      }
+    }
+
+    btnAplicarDescuento.onclick = () => {
+      const codigo = codigoDescuentoInput.value.trim().toUpperCase();
+      if (codigo === 'DESCUENTO10') {
+        descuentoActivo = 0.10;
+        alert('¡Código aplicado! 10% de descuento.');
+      } else {
+        descuentoActivo = 0;
+        alert('Código inválido.');
+      }
+      calcularTotal();
+    };
+
+    btnPagar.onclick = () => {
+      if (carrito.length === 0) {
+        alert('Tu carrito está vacío.');
+        return;
+      }
+      const tarjetaSeleccionada = document.querySelector('input[name="tarjeta"]:checked').value;
+      alert(`Pago realizado con ${tarjetaSeleccionada} por un total de ${totalPagarEl.textContent.replace('Total: ', '')}`);
+      window.location.href = 'pagina_confirmacion.html';
+    };
+
+    // DEMO: Añadir los 3 productos al cargar
+    agregarProducto(1);
+    agregarProducto(2);
+    agregarProducto(3);
+  </script>
+
+</body>
+</html>

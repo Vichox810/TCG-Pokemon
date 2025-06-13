@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel de Administrador</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f0f2f5;
+      display: flex;
+      height: 100vh;
+    }
+
+    nav {
+      width: 220px;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+    }
+
+    nav h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 15px 20px;
+      border-left: 4px solid transparent;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    nav a:hover, nav a.active {
+      background-color: #34495e;
+      border-left: 4px solid #1abc9c;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    header input[type="search"] {
+      width: 300px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    header input[type="search"]:focus {
+      border-color: #1abc9c;
+      box-shadow: 0 0 5px #1abc9c;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #1abc9c;
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:hover {
+      background-color: #f1f9f8;
+    }
+
+    /* Botones */
+    button {
+      background-color: #1abc9c;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #16a085;
+    }
+
+    /* Formulario para agregar/editar */
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    form input, form textarea, form select {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h2>PokeAdmind</h2>
+    <a href="#" class="active" data-section="pedidosRealizados">Pedidos realizados</a>
+    <a href="#" data-section="pedidosPendientes">Pedidos pendientes</a>
+    <a href="#" data-section="pedidosEntregados">Pedidos entregados</a>
+    <a href="#" data-section="stock">Stock</a>
+    <a href="#" data-section="encargos">Encargos</a>
+    <a href="#" data-section="editarProductos">Editar / Agregar productos</a>
+  </nav>
+
+  <main>
+    <header>
+      <input type="search" id="searchInput" placeholder="Buscar por nombre o código..." />
+    </header>
+
+    <!-- Secciones -->
+    <section id="pedidosRealizados" class="active-section">
+      <h3>Pedidos realizados</h3>
+      <table id="tablaPedidosRealizados">
+        <thead>
+          <tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <!-- Datos dinámicos -->
+          <tr><td>001</td><td>Juan Pérez</td><td>2025-06-01</td><td>Realizado</td><td>$50</td></tr>
+          <tr><td>002</td><td>Ana Gómez</td><td>2025-06-03</td><td>Realizado</td><td>$75</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="pedidosPendientes" style="display:none;">
+      <h3>Pedidos pendientes</h3>
+      <table id="tablaPedidosPendientes">
+        <thead>
+          <tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>003</td><td>Carlos Ruiz</td><td>2025-06-05</td><td>Pendiente</td><td>$40</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="pedidosEntregados" style="display:none;">
+      <h3>Pedidos entregados</h3>
+      <table id="tablaPedidosEntregados">
+        <thead>
+          <tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>000</td><td>Laura Medina</td><td>2025-05-30</td><td>Entregado</td><td>$100</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="stock" style="display:none;">
+      <h3>Stock</h3>
+      <table id="tablaStock">
+        <section id="stock" style="display:none;">
+  <h3>Stock</h3>
+  <table id="tablaStock">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Producto</th>
+        <th>Imagen</th> <!-- Nueva columna -->
+        <th>Cantidad</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1001</td>
+        <td>Deck Zacian</td>
+        <td><img src="img/Zacian.png" alt="Deck Zacian" style="width:60px; height:auto; border-radius:6px;"></td>
+        <td>30</td>
+        <td>$25</td>
+      </tr>
+      <tr>
+        <td>1002</td>
+        <td>Deck Zamazenta</td>
+        <td><img src="img/Zamazenta.png" alt="Deck Zamazenta" style="width:60px; height:auto; border-radius:6px;"></td>
+        <td>20</td>
+        <td>$40</td>
+      </tr>
+      <tr>
+        <td>1003</td>
+        <td>Mewtwo Equipo Rocket</td>
+        <td><img src="img/Mewtwo.png" alt="Mewtwo Equipo Rocket" style="width:60px; height:auto; border-radius:6px;"></td>
+        <td>15</td>
+        <td>$50</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+    <section id="encargos" style="display:none;">
+      <h3>Encargos</h3>
+      <table id="tablaEncargos">
+        <thead>
+          <tr><th>Código</th><th>Cliente</th><th>Detalle</th><th>Fecha</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2001</td><td>Sofía</td><td>Pedido especial de Deck Zacian</td><td>2025-06-06</td><td>En proceso</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="editarProductos" style="display:none;">
+      <h3>Editar / Agregar Productos</h3>
+      <form id="formProducto">
+        <label for="codigo">Código:</label>
+        <input type="text" id="codigo" name="codigo" placeholder="Código del producto" required />
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Nombre del producto" required />
+
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" name="cantidad" min="0" placeholder="Cantidad en stock" required />
+
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" name="precio" min="0" step="0.01" placeholder="Precio" required />
+
+        <button type="submit">Guardar</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // Cambiar secciones desde el menú
+    const links = document.querySelectorAll('nav a');
+    const sections = document.querySelectorAll('main section');
+
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        const target = link.getAttribute('data-section');
+        sections.forEach(sec => {
+          if (sec.id === target) {
+            sec.style.display = 'block';
+          } else {
+            sec.style.display = 'none';
+          }
+        });
+
+        // Limpiar búsqueda al cambiar sección
+        searchInput.value = '';
+        filterTable('');
+      });
+    });
+
+    // Búsqueda en la tabla visible
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', () => {
+      filterTable(searchInput.value.toLowerCase());
+    });
+
+    function filterTable(query) {
+      // Buscar solo en la tabla visible
+      const visibleSection = Array.from(sections).find(sec => sec.style.display === 'block');
+      if (!visibleSection) return;
+
+      const rows = visibleSection.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Simulación de guardar producto nuevo o editar (solo frontend)
+    const formProducto = document.getElementById('formProducto');
+    formProducto.addEventListener('submit', e => {
+      e.preventDefault();
+      alert('Producto guardado (simulado).');
+      formProducto.reset();
+    });
+  </script>
+
+</body>
+</html>

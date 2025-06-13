@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda Pokémon</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 10px;
+      position: relative;
+    }
+
+    .contador-carrito {
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+    }
+
+    .btnAgregar {
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btnAgregar:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="text-align:center; margin: 20px 0 40px 0;">
+    <a href="admin.html"
+       style="
+         display: inline-block;
+         background-color: #1abc9c;
+         color: white;
+         padding: 15px 30px;
+         border-radius: 8px;
+         text-decoration: none;
+         font-weight: 700;
+         font-size: 1.2rem;
+         box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4);
+         transition: background-color 0.3s;
+       "
+       onmouseover="this.style.backgroundColor='#16a085'"
+       onmouseout="this.style.backgroundColor='#1abc9c'">
+      Entrar al Panel de Administrador
+    </a>
+  </div>
+
+  <header>
+    <a href="perfil.html">
+      <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" class="icon" alt="Perfil">
+    </a>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Buscar...">
+      <button onclick="buscarCartas()">Buscar</button>
+    </div>
+
+    <a href="carrito.html" style="position: relative;">
+      <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" class="icon" alt="Carrito">
+      <span id="contadorCarrito" class="contador-carrito" style="display:none;">0</span>
+    </a>
+  </header>
+
+  <main>
+    <section>
+      <h2>¡Decks Recomendados!</h2>
+      <div class="cards-container" id="cartasRecomendadas">
+        <div class="card" data-tipo="Paradox">
+          <img src="img/Paradox.png" alt="Paradox Deck">
+          <p>Paradox<br>$35.99</p>
+        </div>
+        <div class="card" data-tipo="Mewtwo Y Melmetal">
+          <img src="img/Mewtwo-Meltan.png" alt="Mewtwo y Melmetal V">
+          <p>Mewtwo y Melmetal V<br>$30.99</p>
+        </div>
+        <div class="card" data-tipo="Zacian">
+          <img src="img/Zacian.png" alt="Zacian">
+          <p>Deck Zacian<br>$25.99</p>
+        </div>
+        <div class="card" data-tipo="Zamazenta">
+          <img src="img/Zamazenta.png" alt="Zamazenta">
+          <p>Deck Zamazenta<br>$25.99</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="edicionEspecial">
+      <h2>¡Ediciones Coleccionistas!</h2>
+      <div class="cards-container">
+        <div class="card" data-tipo="Pikachu">
+          <img src="img/Pikachu.png" alt="Pikachu Teracristal">
+          <p>Deck Pikachu Teracristal<br>$50.99</p>
+        </div>
+        <div class="card" data-tipo="Mewtwo">
+          <img src="img/Mewtwo.png" alt="Mewtwo Ex Equipo Rocket">
+          <p>Box Mewtwo Equipo Rocket<br>$75.99</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact">
+      <h2>Datos de contacto</h2>
+      <p>Número: +569 8487 6228</p>
+      <p>Correo: gengar@pokemon.cl</p>
+      <p>Dirección: Calle Pokémon, Frutillar</p>
+    </section>
+
+    <script>
+      const inputBusqueda = document.getElementById('searchInput');
+      const contenedores = [
+        document.getElementById('cartasRecomendadas'),
+        document.querySelector('#edicionEspecial .cards-container')
+      ];
+
+      function buscarCartas() {
+        const filtro = inputBusqueda.value.toLowerCase().trim();
+
+        contenedores.forEach(contenedor => {
+          if (!contenedor) return;
+          const cartas = contenedor.querySelectorAll('.card');
+          cartas.forEach(carta => {
+            const textoCarta = carta.textContent.toLowerCase();
+            carta.style.display = textoCarta.includes(filtro) ? 'block' : 'none';
+          });
+        });
+      }
+
+      inputBusqueda.addEventListener('input', buscarCartas);
+
+      // -------- FUNCIONALIDAD DE AÑADIR AL CARRITO --------
+      const contador = document.getElementById('contadorCarrito');
+
+      // Inicializar carrito si no existe
+      if (!localStorage.getItem('carrito')) {
+        localStorage.setItem('carrito', JSON.stringify([]));
+      }
+
+      // Crear botones y añadir eventos
+      document.querySelectorAll('.card').forEach(carta => {
+        const btn = document.createElement('button');
+        btn.textContent = 'Añadir al carrito';
+        btn.classList.add('btnAgregar');
+        carta.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+          const nombre = carta.querySelector('p').innerText.split('\n')[0].trim();
+          const precio = parseFloat(carta.querySelector('p').innerText.split('$')[1]);
+          const imagen = carta.querySelector('img').getAttribute('src');
+
+          let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+          carrito.push({ nombre, precio, imagen });
+          localStorage.setItem('carrito', JSON.stringify(carrito));
+
+          contador.textContent = carrito.length;
+          contador.style.display = 'inline-block';
+        });
+      });
+
+      // Mostrar contador si ya hay productos guardados
+      const carritoActual = JSON.parse(localStorage.getItem('carrito')) || [];
+      if (carritoActual.length > 0) {
+        contador.textContent = carritoActual.length;
+        contador.style.display = 'inline-block';
+      }
+    </script>
+  </main>
+
+</body>
+</html>
